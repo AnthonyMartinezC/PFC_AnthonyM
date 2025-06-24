@@ -17,7 +17,7 @@ class _QRGeneratorPageState extends State<QRGeneratorPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Generador de QR'),
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.blueGrey,
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
