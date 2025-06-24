@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../services/firebase_service.dart';
 import '../widgets/product_card.dart';
+import '../models/producto.dart';
 
 class WomenPage extends StatefulWidget {
   const WomenPage({super.key});
@@ -10,38 +12,29 @@ class WomenPage extends StatefulWidget {
 
 class _WomenPageState extends State<WomenPage> {
   final ScrollController _scrollController = ScrollController();
-  List<Map<String, String>> _products = List.generate(10, (index) => {
-    'title': 'Sombrero Mujer ${index + 1}',
-    'price': '49.99',
-    'image': 'assets/images/sombrero2.jpg' // Usa otra imagen si quieres
-  });
+  List<Producto> _products = [];
   bool _isLoading = false;
-
-  void _loadMore() async {
-    if (_isLoading) return;
-    setState(() => _isLoading = true);
-
-    await Future.delayed(const Duration(seconds: 2)); // Simula carga
-
-    setState(() {
-      _products.addAll(List.generate(6, (index) => {
-        'title': 'Sombrero Mujer ${_products.length + index + 1}',
-        'price': '49.99',
-        'image': 'assets/images/sombrero2.jpg'
-      }));
-      _isLoading = false;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
+    _loadProducts();
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100 &&
           !_isLoading) {
-        _loadMore();
+        // Aquí puedes implementar paginación más adelante
       }
+    });
+  }
+
+  void _loadProducts() async {
+    setState(() => _isLoading = true);
+    final productos = await FirebaseService.obtenerProductosPorCategoria('women');
+    setState(() {
+      _products = productos;
+      _isLoading = false;
     });
   }
 
@@ -55,10 +48,12 @@ class _WomenPageState extends State<WomenPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Sombreros para Mujeres")),
-      body: GridView.builder(
+      body: _isLoading && _products.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : GridView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.all(16),
-        itemCount: _products.length + 1,
+        itemCount: _products.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // Dos columnas
           crossAxisSpacing: 16,
@@ -66,18 +61,12 @@ class _WomenPageState extends State<WomenPage> {
           childAspectRatio: 0.7,
         ),
         itemBuilder: (context, index) {
-          if (index < _products.length) {
-            final product = _products[index];
-            return ProductCard(
-              imageUrl: product['image'] ?? '',
-              title: product['title'] ?? '',
-              price: product['price'] ?? '',
-            );
-          } else {
-            return _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : const SizedBox.shrink();
-          }
+          final product = _products[index];
+          return ProductCard(
+            imageUrl: product.image_url,
+            title: product.nombre,
+            price: product.precio.toStringAsFixed(2),
+          );
         },
       ),
     );

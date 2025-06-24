@@ -1,16 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/producto.dart';
 
 class FirebaseService {
-  static Future<bool> verifyHat(String code) async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('hats')
-          .where('qrCode', isEqualTo: code)
-          .limit(1)
-          .get();
-      return snapshot.docs.isNotEmpty;
-    } catch (e) {
-      return false;
-    }
+  static Future<List<Producto>> obtenerProductosPorCategoria(String categoria) async {
+    final query = await FirebaseFirestore.instance
+        .collection('productos')
+        .where('categoria', isEqualTo: categoria)
+        .get();
+
+    return query.docs
+        .map((doc) => Producto.fromMap(doc.id, doc.data()))
+        .toList();
   }
 }

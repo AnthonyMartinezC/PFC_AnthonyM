@@ -11,6 +11,8 @@ import '../widgets/responsive/desktop_layout.dart';
 import 'cart_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qr_verify_page.dart';
+import 'qr_generator_page.dart'; // Ajusta la ruta si no está en el mismo directorio
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -183,10 +185,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       MaterialPageRoute(builder: (_) => const CartPage()),
                     );
                   }),
+                  const SizedBox(height: 12),
+                  Tooltip(
+                    message: 'Generar QR',
+                    child: _floatingIcon(Icons.construction_outlined, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const QRGeneratorPage()),
+                      );
+                    }),
+                  ),
+
                 ],
               ),
             ),
           ),
+
+
         ],
       ),
     );

@@ -20,17 +20,22 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Imagen
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.asset(
+              child: imageUrl.startsWith('http')
+                  ? Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image),
+              )
+                  : Image.asset(
                 imageUrl,
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Título y Precio
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -41,7 +46,6 @@ class ProductCard extends StatelessWidget {
               ],
             ),
           ),
-          // Botón
           ElevatedButton(
             onPressed: () {
               // Aquí podrías añadir al carrito o mostrar detalles
