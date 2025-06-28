@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_final_qr_scanner/screens/home_page.dart';
+import 'package:proyecto_final_qr_scanner/services/cart_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -16,11 +18,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Austro Hats',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
-      home: const HomePage(),
+    return ChangeNotifierProvider(
+      create: (context) => CartService(),
+      child: MaterialApp(
+        title: 'Austro Hats',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.light(),
+        home: const HomePage(),
+      ),
     );
   }
 }

@@ -63,9 +63,8 @@ class _MenPageState extends State<MenPage> {
         itemBuilder: (context, index) {
           final product = _products[index];
           return ProductCard(
-            imageUrl: product.image_url,
-            title: product.nombre,
-            price: product.precio.toStringAsFixed(2),
+            producto: product,    // ✅ Pasamos el objeto Producto completo
+            categoria: 'men',     // ✅ Categoría para el carrito
           );
         },
       ),

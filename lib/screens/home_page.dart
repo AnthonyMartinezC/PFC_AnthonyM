@@ -11,8 +11,9 @@ import '../widgets/responsive/desktop_layout.dart';
 import 'cart_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qr_verify_page.dart';
-import 'qr_generator_page.dart'; // Ajusta la ruta si no está en el mismo directorio
-
+import 'qr_generator_page.dart';
+import 'package:provider/provider.dart';
+import '../services/cart_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -117,28 +118,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               if (MediaQuery.of(context).size.width >= 600)
                 FirebaseAuth.instance.currentUser == null
                     ? ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const LoginPage()),
-                    );
-                  },
-                  child: const Text("LOGIN"),
-                )
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginPage(),
+                            ),
+                          );
+                        },
+                        child: const Text("LOGIN"),
+                      )
                     : ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                  ),
-                  onPressed: _logout,
-                  child: const Text(
-                    "LOGOUT",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                        ),
+                        onPressed: _logout,
+                        child: const Text(
+                          "LOGOUT",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
             ],
           ),
         ),
@@ -174,34 +176,65 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   _floatingIcon(Icons.qr_code_scanner, () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => const QRVerifyPage()),
+                      MaterialPageRoute(builder: (_) => const QRVerifyPage()),
                     );
                   }),
                   const SizedBox(height: 12),
-                  _floatingIcon(Icons.shopping_cart, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CartPage()),
-                    );
-                  }),
+                  Consumer<CartService>(
+                    builder: (context, cartService, child) {
+                      return Stack(
+                        children: [
+                          _floatingIcon(Icons.shopping_cart, () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const CartPage()),
+                            );
+                          }),
+                          if (cartService.itemCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 20,
+                                  minHeight: 20,
+                                ),
+                                child: Text(
+                                  '${cartService.itemCount}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 12),
                   Tooltip(
                     message: 'Generar QR',
                     child: _floatingIcon(Icons.construction_outlined, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const QRGeneratorPage()),
+                        MaterialPageRoute(
+                          builder: (_) => const QRGeneratorPage(),
+                        ),
                       );
                     }),
                   ),
-
                 ],
               ),
             ),
           ),
-
-
         ],
       ),
     );
